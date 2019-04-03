@@ -1,5 +1,7 @@
 # In Atom, press Ctrl + Shift + l to select language
 
+# outliers are typically replaced with max or min values; missing values with mean or median values
+
 # check working directory
 pwd()
 # set working directory
@@ -23,6 +25,8 @@ Pkg.add("CSV")
 # read in CSV dataframe
 using CSV
 df = CSV.read("magic04.csv")
+# or
+df = readtable("magic04.csv")
 # read in CSV as array
 using DelimitedFiles
 array = readdlm("magic04.csv",',')
@@ -30,6 +34,18 @@ array = readdlm("magic04.csv",',')
 f = open("C:/Users/Matt/Desktop/Julia files/easy_ham/0001.ea7e79d3153e7469e7a9c3e0af6a357e","r")
 lines = readlines(f); # parses whole file; splits inot one-line strings and returns array of strings as output
 close(f)
+# read in a json file
+Pkg.add(“JSON”)
+import JSON
+f = open(“file.json”)
+x = JSON.parse(f)
+close(f)
+# save data to json file
+f = open("test.json", "w")
+JSON.print(f,X)
+close(f)
+# save dataframes into data files
+writetable("dataset.csv", df) # also works for tsv files
 
 
 # transforming data types
@@ -270,3 +286,17 @@ function main(X::Array)
     end
     return Y
 end
+
+# strip text stored in variable S of irrelevant characters
+S = "@IamaT2018sTRISing])()2234ten"
+typeof(S)
+function strip(X::Any)
+    for c in X
+        Z = ""
+        if lowercase(c) in "qwertyuiopasdfghjklzxcvbnm "
+            Z = string(Z,c)
+        end
+    end
+    return Z
+end
+strip(S)

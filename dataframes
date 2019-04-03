@@ -1,0 +1,69 @@
+using Pkg
+Pkg.update()
+Pkg.add("DataFrames")
+using DataFrames
+df = DataFrame() # empty dataframe
+
+da1 = Array([1,2,3,4,5,6,7,8,9,10])
+da2 = Array([20,21,22,23,24,25,26,27,28,29])
+
+# combine data arrays into a dataframe using an empty dataframe
+df[:var1] = da1
+df[:var2] = da2
+# using the colon tells Julia that what follows is a symbol; "var1" refers to a column named "var1"
+show(df)
+
+# find column names / variables of dataframe
+names(df)
+ # rename column names
+rename!(df, [:var1, :var2], [:length, :width])
+# the exclamation point means the function will change the data; not using one just shows the result
+# rename columns again using multiple dispatch
+rename!(df, :width, :height)
+# delete variable / column
+delete!(df,:Width)
+# call out variable name
+df[:length]
+# explore dataframe by number
+df[1]
+# select rows of a variable
+df[1:5, [:length]]
+# use conditions on variables to glean info about rows
+count(df[:length] .> 2) # counts how many rows whose length is greater than 2
+# show all rows whose length is greater than 2
+df[df[:length] .> 2,:] # the colon after the comma selects all data, rows and columns
+# replace value with value
+df[df[:weight] .== 1, :weight] = 3)
+# insert new data point / new row of data
+push!(df,([6,7,10]))
+
+# show data types
+showcols(df)
+# show first few rows
+head(df)
+tail(df)
+# view descriptive stats of variables
+describe(df)
+
+# apply functions to dataframes
+colwise(maximum, df) # returns max value of all variables in df
+# find mean of select rows
+colwise(mean,df[[:length,:height]]) # need to use double brackets here; otherwise it returns an array
+
+# handling NAs or missing (as called in Julia); only dataframes can handle missing; not arrays
+df.weight=[10,20,-1,15,25,5,10,20,-1,5]
+# alternative way to add a variable to a dataframe: df[:weight] = Array([10,20,-1,15,25,5,10,20,-1,5])
+# convert weight to type Any in case you want to mix types
+df[:weight] = convert(Array{Float64}, df[:weight])
+df
+# find missing values
+ismissing(df)
+# replace the missings with mean
+Missings.replace(df.weight, mean(df[:weight]))
+
+# order dataframes
+by(df,:weight,nrow) # order unique values in weight in ascending order.
+sort(df,cols = [order(:height),order(:weight)]) # order all elements based on a variable or variables
+
+# load csv into dataframe
+df = readtable("CaffeineForTheForce.csv")
