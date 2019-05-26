@@ -9,6 +9,17 @@ cd("C:/Users/Matt/Desktop/Julia files")
 # find version of Julia
 VERSION
 
+# normalization techniques
+# feature scaling
+norm_x = (x-minimum(x))/(maximum(x)-minimum(x)) # normalize data between [0,1]
+# mean-standard deviation normalization
+norm_x = (x-mean(x))/std(x) # center data around zero; typically between [-3,3]
+# sigmoidal normalization
+norm_x = 1 ./ (1+exp(-x)) # immune to outliers; find proper parameters; can yield clustered normalized variable
+
+# discretization (binning) and binarization
+
+
 
 # adding packages and reading in data
 # stochastic diff eq.s solver!
@@ -47,6 +58,8 @@ close(f)
 # save dataframes into data files
 writetable("dataset.csv", df) # also works for tsv files
 
+# read in file and address missing values (aka NAs)
+pt1 = readtable("file.tsv", nastrings=["NA", "na", "n/a", "missing"])
 
 # transforming data types
 string(1234)
@@ -134,6 +147,31 @@ s2 = ["I","like","strings"]
 join(s2," ")
 join(s,s2) # adds each element of s2 to each letter in s
 
+# add column to dataframe
+df[colname] = [value]
+# add new column using calculation of existing columns
+ptable[:Temp] = map((x,y) -> y * x, ptable[:Liquid], ptable[:AtomicWeight])
+# rename column
+rename!(ptable, :Temp => :Junk)
+# delete column
+delete!(ptable, :Junk)
+# delete rows
+deleterows!(temp, 3:5)
+# delete rows meeting a special condition
+ptable1 = ptable[ptable[:Boil] .>= 100, :]
+# find value in dataframe
+ptable[:, :Melt] .< 100
+# find matching entries
+df[contains.("Copper", df[:Name]), :]
+df[ismatch.(r"C.*", df[:Name]), :]
+# group based on criteria
+groupby(ptable, [:Room])
+# sort data
+sort!(ptable, [order(:Room), order(:AtomicWeight)])
+# list of column names
+names(df)
+# merge dataframes
+append!(X2,p)
 
 # Regex integration
 # occursin checks a given string for the presence of absence of a regex pattern

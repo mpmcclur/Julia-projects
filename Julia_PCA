@@ -1,0 +1,55 @@
+# Principle components analysis is an unsupervised dimensionality reduction technique, which is implemented
+# to exclude certain variables in a dataset when solving a problem.
+# Independent component analysis (ICA) is a worthy alternative to PCA; similarly, it does not utilize the target variable.
+# ICA works by maximizing the mutual information metric, instead of the variance. It also provides metafeatures.
+
+cd("C:/Users/Matt/Desktop/Julia files")
+using Pkg
+Pkg.add("MultivariateStats")
+using MultivariateStats
+# read in as dataframe
+using CSV
+X = CSV.read("OnlineNewsPopularity.csv")
+# get only numerical data
+X2 = X[2:end,2:end]
+# add dummy rows to round total row number to 39650 for PCA analysis below
+using DataFrames
+p = DataFrame(zeros(Float64, 7,60)) # dataframe of zeroes
+names!(p,names(X2)) # copy names of X2 to new dataframe
+append!(X2,p) # merge dataframes by appending new DF to end of X2
+X2
+# convert output variable into a binary one
+using LinearAlgebra
+function pca_svd(X)
+    n, p = size(X)
+    k = min(n,p)
+    S = svd(X)
+    D = S.S[1:k]
+    V = transpose(S.Vt)[:,1:k]
+    sD = /(D, sqrt(n-1))
+    rotation = V
+    projection = *(X, V)
+    return(Dict(
+    "sd" => sD,
+    "rotation" => rotation,
+    "projection" => projection
+    ))
+end
+## each variable is mean centered
+pop_mat = convert(Array, X2)
+using Statistics
+mean_pop = mean(pop_mat, dims = 1)
+pop_mat_c = pop_mat .- mean_pop
+pca1 = pca_svd(pop_mat)
+pop_mat
+## df for plotting
+## label is the combination of sp and sex
+pca1
+using DataFrames
+pca_df2 = DataFrame(
+pc1 = pca1["projection"][:,1],
+pc2 = pca1["projection"][:,2],
+pc3 = pca1["projection"][:,3],
+pc4 = pca1["projection"][:,4],
+label = map(string, repeat(1:793, inner = 50)))
+pca_df2 # PCA constructed with 4 features
